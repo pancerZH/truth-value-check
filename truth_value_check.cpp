@@ -53,6 +53,8 @@ bool dealVal(string& subStr,string& val)
 							break;
 						}
 					}
+					else
+						boolVal=temp;
 					break;
 				case '|':
 					boolVal=(boolVal||temp);
