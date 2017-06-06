@@ -22,11 +22,12 @@ int main()
 bool dealVal(string& subStr,string& val)
 {
 	auto beginPos=subStr.find('(');
-	auto endPos=findIt(subStr,beginPos);
+	auto endPos=beginPos;
 	bool boolVal=true,temp=true;
 
 	while(beginPos!=string::npos)
 	{
+		endPos=findIt(subStr,beginPos);
 		auto newStr=subStr.substr(beginPos+1,endPos-beginPos-1);
 		temp=dealVal(newStr,val);
 		if(beginPos==0)
@@ -66,7 +67,6 @@ bool dealVal(string& subStr,string& val)
 			}
 		}
 		beginPos=subStr.find('(',endPos);
-		endPos=findIt(subStr,beginPos);
 	}
 
 	size_t num;
