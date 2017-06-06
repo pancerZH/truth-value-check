@@ -22,33 +22,83 @@ int main()
 bool dealVal(string& subStr,string& val)
 {
 	auto beginPos=subStr.find('(');
+	auto endPos=findIt(subStr,beginPos);
 	bool boolVal=true,temp=true;
 
-	if(beginPos!=string::npos)
+	while(beginPos!=string::npos)
 	{
-		while(beginPos!=string::npos)
+		auto newStr=subStr.substr(beginPos+1,endPos-beginPos-1);
+		temp=dealVal(newStr,val);
+		if(beginPos==0)
+			boolVal=temp;
+		else
 		{
-			auto endPos=findIt(subStr,beginPos);
-			auto newStr=subStr.substr(beginPos+1,endPos-beginPos-1);
-			temp=dealVal(newStr,val);
-			if(beginPos==0)
+			switch(subStr[beginPos-1])
+			{
+			case '!':
+				temp=!temp;
+				if(beginPos>1)
+				{
+					switch(subStr[beginPos-2])
+					{
+					case '|':
+						boolVal=(boolVal||temp);
+						break;
+					case '&':
+						boolVal=(boolVal&&temp);
+						break;
+					default:
+						break;
+					}
+				}
+				else
+					boolVal=temp;
+				break;
+			case '|':
+				boolVal=(boolVal||temp);
+				break;
+			case '&':
+				boolVal=(boolVal&&temp);
+				break;
+			default:
 				boolVal=temp;
+				break;
+			}
+		}
+		beginPos=subStr.find('(',endPos);
+		endPos=findIt(subStr,beginPos);
+	}
+
+	size_t num;
+	if(endPos==string::npos)
+		num=0;
+	else
+		num=endPos+1;
+	while(num<subStr.length())
+	{
+		if(subStr[num]=='p')//如果是命题
+		{
+			auto iPos=atoi(subStr.substr(num+1).c_str());
+			if(num==0)
+			{
+				boolVal=static_cast<bool>(val[iPos]-'0');
+				temp=static_cast<bool>(val[iPos]-'0');
+			}
 			else
 			{
-				switch(subStr[beginPos-1])
+				temp=static_cast<bool>(val[iPos]-'0');
+				switch(subStr[num-1])
 				{
 				case '!':
 					temp=!temp;
-					if(beginPos>1)
+					if(num>1)
 					{
-						switch(subStr[beginPos-2])
+						switch(subStr[num-2])
 						{
 						case '|':
 							boolVal=(boolVal||temp);
-							break;
 						case '&':
 							boolVal=(boolVal&&temp);
-							break;
 						default:
 							break;
 						}
@@ -63,62 +113,11 @@ bool dealVal(string& subStr,string& val)
 					boolVal=(boolVal&&temp);
 					break;
 				default:
-					boolVal=temp;
 					break;
 				}
 			}
-			beginPos=subStr.find('(',endPos);
 		}
-	}
-
-	else
-	{
-		size_t num=0;
-		while(num<subStr.length())
-			{
-			if(subStr[num]=='p')//如果是命题
-			{
-				auto iPos=atoi(subStr.substr(num+1).c_str());
-				if(num==0)
-				{
-					boolVal=static_cast<bool>(val[iPos]-'0');
-					temp=static_cast<bool>(val[iPos]-'0');
-				}
-				else
-				{
-					temp=static_cast<bool>(val[iPos]-'0');
-					switch(subStr[num-1])
-					{
-					case '!':
-						temp=!temp;
-						if(num>1)
-						{
-							switch(subStr[num-2])
-							{
-							case '|':
-								boolVal=(boolVal||temp);
-							case '&':
-								boolVal=(boolVal&&temp);
-							default:
-								break;
-							}
-						}
-						else
-							boolVal=temp;
-						break;
-					case '|':
-						boolVal=(boolVal||temp);
-						break;
-					case '&':
-						boolVal=(boolVal&&temp);
-						break;
-					default:
-						break;
-					}
-				}
-			}
-			++num;
-		}
+		++num;
 	}
 	return boolVal;
 }
